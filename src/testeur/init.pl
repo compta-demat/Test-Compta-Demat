@@ -49,8 +49,11 @@ require "$currdir/environnement_alto2.pl";
 our $ProgramFiles = "$ENV{ProgramFiles}";
 our $ProgramData = "$ENV{ProgramData}";
 
+
 require "$currdir/alto2_fonctions.pl";
 require "$currdir/trt_entete.pl";
+
+
 
 
 # logs en base pg
@@ -574,7 +577,7 @@ sub traitement() {
 	#	}
 		$xml_file = $file;
 		$file =~ s/[\.xml]*$/.dat/i;
-	
+
 		$rc = system(
 	"${pref_chem}trt_xml$exe_ou_pl   -o \"$file\"  -f  \"$xml_file\"  -T EXERCICE  -t JOURNAL  -n $log_seq -e \"$line\" 2>${err_file}_xml"
 		);    # ajouter -d  pour activer les traces sur xml

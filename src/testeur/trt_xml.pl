@@ -64,6 +64,12 @@ if ( $Aorte eq "t" ) {
     $Rep_Alim_ou_Testeur = "testeur";
 }
 
+our $Rep_Alim_ou_Testeur = "alimentation";
+our $Aorte = &aorte();
+if ( $Aorte eq "t" ) {
+    $Rep_Alim_ou_Testeur = "testeur";
+}
+
 # logs en base pg
 our $dbhlog;
 my $dbh;
@@ -426,6 +432,10 @@ sub constructionPlat {
                 . "donnee code : "
                 . $plat_code[$indice_xml] );
         $txt[$indice_txt] = $plat[$indice_xml];
+       # if ( $plat[$indice_xml] !~ m/^[\+\-]*[0-9]{1,}\.*[0-9]*[\+\-]*$/ ) {
+        if ( $plat[$indice_xml] =~ m/^[\+\-]?[ ]*([0-9]*)\.(([0-9])*)[ ]*$/ ) {
+            $txt[$indice_txt]  =~ tr/./,/;
+        }
     }
 
   #RG:F: retraitement debit / credit par ligne en présence de Montant/sens :I
@@ -433,11 +443,13 @@ sub constructionPlat {
     if ( defined $plat[$pos_sens] && defined $plat[$pos_montant] ) {
         &trace( "Montant : " . $plat[$pos_montant] . " SENS :" . $plat[$pos_sens] );
         if ( uc( $plat[$pos_sens] ) eq "C" || $plat[$pos_sens] =~ /^\s*\-1\s*$/ ) {
+            $plat[$pos_montant] =~ tr/./,/;
             $txt[10] = $plat[$pos_montant];
             $txt[9]  = 0;
 
         }
         elsif ( uc( $plat[$pos_sens] ) eq "D" || $plat[$pos_sens] =~ /^\s*\+1\s*$/ ) {
+            $plat[$pos_montant] =~ tr/./,/;
             $txt[9]  = $plat[$pos_montant];
             $txt[10] = 0;
         }
@@ -651,8 +663,10 @@ sub reglesMetier {
         }
     }
     elsif ( $metier eq 'NU' ) {
+    #2021 forcage fichier xml separateur , pour compatibilite fichiers plats
         $valeurSortie =~ tr/,/./;
         if ( $valeurSortie !~ m/^[\+\-]*[0-9]{1,}\.*[0-9]*[\+\-]*$/ ) {
+        #if ( $valeurSortie !~ m/^[\+\-]*[0-9]{1,},*[0-9]*[\+\-]*$/ ) {
             &trace( "Somme incorrecte $valeurEntree \n", "X" );
         }
 
